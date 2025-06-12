@@ -15,6 +15,7 @@ COPY conf/ /etc/postgresql/
 
 # Установка прав
 RUN chown -R postgres:postgres /etc/postgresql && \
-    chmod +x /docker-entrypoint-initdb.d/*.sh
+    chmod +x /docker-entrypoint-initdb.d/*.sh && \
+    chown -R postgres:postgres /var/lib/postgresql/data
 
 USER postgres 

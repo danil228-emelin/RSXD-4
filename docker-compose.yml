@@ -15,9 +15,9 @@ services:
       - PGUSERNAME=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./node_a/data:/var/lib/postgresql/data
-      - ./node_a/conf:/etc/postgresql
-      - ./node_a/scripts:/docker-entrypoint-initdb.d
+      - ./node_a/data:/var/lib/postgresql/data:z
+      - ./node_a/conf:/etc/postgresql:z
+      - ./node_a/scripts:/docker-entrypoint-initdb.d:z
     networks:
       - pg_net
     healthcheck:
@@ -25,6 +25,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    security_opt:
+      - label=disable
 
   node_b:
     container_name: node_b
@@ -53,6 +55,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    security_opt:
+      - label=disable
 
   node_c:
     container_name: node_c
@@ -81,7 +85,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    security_opt:
+      - label=disable
   pgpool:
     container_name: pgpool
     build:
@@ -98,8 +103,17 @@ services:
       node_c:
         condition: service_healthy
     environment:
-      - PGPOOL_USERNAME=postgres
-      - PGPOOL_PASSWORD=postgres
+       - PGPOOL_ADMIN_USERNAME=admin
+       - PGPOOL_ADMIN_PASSWORD=adminpass
+       - PGPOOL_SR_CHECK_USER=replicator
+       - PGPOOL_SR_CHECK_PASSWORD=replicatorpass
+       - PGPOOL_HEALTH_CHECK_USER=healthcheck
+       - PGPOOL_HEALTH_CHECK_PASSWORD=healthcheckpass
+       - PGPOOL_POSTGRES_USERNAME=postgres
+       - PGPOOL_POSTGRES_PASSWORD=postgres
+       - PGPOOL_BACKEND_NODES=0:node_a:5432,1:node_b:5432,2:node_c:5432
+       - PGPOOL_USERNAME=postgres
+       - PGPOOL_PASSWORD=postgres
     volumes:
       - ./pgpool/conf:/opt/bitnami/pgpool/conf
     networks:
@@ -109,6 +123,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    security_opt:
+      - label=disable
 
 networks:
   pg_net:
