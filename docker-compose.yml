@@ -117,6 +117,7 @@ services:
        - PGPOOL_BACKEND_NODES=0:node_a:5432,1:node_b:5432,2:node_c:5432
        - PGPOOL_USERNAME=postgres
        - PGPOOL_PASSWORD=postgres
+       - PGPOOL_SR_CHECK_DATABASE=testdb
     volumes:
       - ./pgpool/conf:/opt/bitnami/pgpool/conf
     networks:
