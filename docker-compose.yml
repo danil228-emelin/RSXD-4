@@ -15,11 +15,12 @@ services:
       - PGUSERNAME=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./node_a/data:/var/lib/postgresql/data:z
-      - ./node_a/conf:/etc/postgresql:z
-      - ./node_a/scripts:/docker-entrypoint-initdb.d:z
+      - ./node_a/data:/var/lib/postgresql/data
+      - ./node_a/conf:/etc/postgresql
+      - ./node_a/scripts:/docker-entrypoint-initdb.d
     networks:
-      - pg_net
+      pg_net:
+        ipv4_address: 172.20.0.10
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -49,7 +50,8 @@ services:
       - ./node_b/conf:/etc/postgresql
       - ./node_b/scripts:/docker-entrypoint-initdb.d
     networks:
-      - pg_net
+      pg_net:
+        ipv4_address: 172.20.0.20
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -79,7 +81,8 @@ services:
       - ./node_c/conf:/etc/postgresql
       - ./node_c/scripts:/docker-entrypoint-initdb.d
     networks:
-      - pg_net
+      pg_net:
+        ipv4_address: 172.20.0.30
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -104,11 +107,11 @@ services:
         condition: service_healthy
     environment:
        - PGPOOL_ADMIN_USERNAME=admin
-       - PGPOOL_ADMIN_PASSWORD=adminpass
+       - PGPOOL_ADMIN_PASSWORD=admin_pass
        - PGPOOL_SR_CHECK_USER=replicator
-       - PGPOOL_SR_CHECK_PASSWORD=replicatorpass
+       - PGPOOL_SR_CHECK_PASSWORD=replicator_pass
        - PGPOOL_HEALTH_CHECK_USER=healthcheck
-       - PGPOOL_HEALTH_CHECK_PASSWORD=healthcheckpass
+       - PGPOOL_HEALTH_CHECK_PASSWORD=healthcheck_pass
        - PGPOOL_POSTGRES_USERNAME=postgres
        - PGPOOL_POSTGRES_PASSWORD=postgres
        - PGPOOL_BACKEND_NODES=0:node_a:5432,1:node_b:5432,2:node_c:5432
@@ -117,7 +120,9 @@ services:
     volumes:
       - ./pgpool/conf:/opt/bitnami/pgpool/conf
     networks:
-      - pg_net
+      pg_net:
+        ipv4_address: 172.20.0.40
+      
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -p 9999 -U postgres"]
       interval: 10s
@@ -129,3 +134,7 @@ services:
 networks:
   pg_net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
