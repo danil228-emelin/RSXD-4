@@ -1,0 +1,21 @@
+SELECT pg_read_file('pg_hba.conf');
+
+cat /var/lib/postgresql/data/postgresql.conf
+
+psql -U postgres
+
+SELECT datname FROM pg_database;
+
+
+SELECT current_database();
+
+
+SELECT * FROM pg_roles; \du
+
+
+
+-- Показать все параметры с их текущими значениями
+SELECT name, setting, source, sourcefile 
+FROM pg_settings 
+WHERE source = 'configuration file' 
+AND sourcefile LIKE '%postgresql.conf%';
